@@ -1,0 +1,47 @@
+{
+    "name": "spacecatninja/imager-x-imageboss-transformer",
+    "description": "ImageBoss transformer for Imager X",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "license": "MIT",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "image",
+        "responsive",
+        "transform",
+        "srcset",
+        "picture",
+        "imageboss"
+    ],
+    "support": {
+        "docs": "https://github.com/spacecatninja/craft-imager-x-imageboss-transformer/blob/master/README.md",
+        "issues": "https://github.com/spacecatninja/craft-imager-x-imageboss-transformer/issues"
+    },
+    "authors": [
+        {
+            "name": "SPACECATNINJA",
+            "homepage": "https://www.spacecat.ninja"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "spacecatninja\\imagebosstransformer\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Imager X ImageBoss Transformer",
+        "handle": "imager-x-imageboss-transformer",
+        "schemaVersion": "1.0.0",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "changelogUrl": "https://raw.githubusercontent.com/spacecatninja/craft-imager-x-imageboss-transformer/master/CHANGELOG.md",
+        "components": {},
+        "class": "spacecatninja\\imagebosstransformer\\ImageBossTransformer"
+    }
+}
