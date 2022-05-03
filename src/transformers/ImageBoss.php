@@ -11,6 +11,8 @@ namespace spacecatninja\imagebosstransformer\transformers;
 use craft\base\Component;
 use craft\elements\Asset;
 
+use craft\fs\Local;
+use craft\helpers\App;
 use spacecatninja\imagebosstransformer\ImageBossTransformer;
 use spacecatninja\imagebosstransformer\helpers\ImageBossHelpers;
 use spacecatninja\imagebosstransformer\models\ImageBossTransformedImageModel;
@@ -30,7 +32,7 @@ class ImageBoss extends Component implements TransformerInterface
      *
      * @throws ImagerException
      */
-    public function transform($image, $transforms): ?array
+    public function transform($image, array $transforms): ?array
     {
         $transformedImages = [];
 
@@ -145,6 +147,19 @@ class ImageBoss extends Component implements TransformerInterface
         // Add options
         $urlSegments[] = implode(',', $opts);
         
+        // Add cloud source path if applicable
+        if ($profile->useCloudSourcePath) {
+            try {
+                $fs = $image->getVolume()->getFs();
+                
+                if (property_exists($fs, 'subfolder') && $fs->subfolder !== '' && $fs::class !== Local::class) {
+                    $urlSegments[] = App::parseEnv($fs->subfolder);
+                }
+            } catch (\Throwable) {
+                
+            }
+        }
+        
         // Add file path
         $urlSegments[] = $image->path;
         
@@ -159,4 +174,5 @@ class ImageBoss extends Component implements TransformerInterface
         
         return new ImageBossTransformedImageModel($url, $image, $transform);
     }
+    
 }

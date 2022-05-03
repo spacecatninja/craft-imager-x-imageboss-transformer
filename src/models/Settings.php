@@ -12,11 +12,11 @@ use craft\base\Model;
 
 class Settings extends Model
 {
-    public $baseUrl = 'https://img.imageboss.me';
-    public $apiKey = '';
-    public $defaultProfile = '';
-    public $profiles = [];
-    public $enableCompression = true;
-    public $enableProgressive = true;
-    public $enableAutoRotate = true;
+    public string $baseUrl = 'https://img.imageboss.me';
+    public string $apiKey = '';
+    public string $defaultProfile = '';
+    public array $profiles = [];
+    public bool $enableCompression = true;
+    public bool $enableProgressive = true;
+    public bool $enableAutoRotate = true;
 }

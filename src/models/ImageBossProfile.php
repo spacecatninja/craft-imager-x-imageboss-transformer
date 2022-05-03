@@ -12,7 +12,7 @@ use craft\base\Model;
 
 class ImageBossProfile extends Model
 {
-    public $sourceName = '';
-    public $signToken = '';
-    public $useCloudSourcePath = false;
+    public string $sourceName = '';
+    public string $signToken = '';
+    public bool $useCloudSourcePath = false;
 }

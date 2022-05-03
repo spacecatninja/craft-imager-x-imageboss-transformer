@@ -8,6 +8,7 @@
 
 namespace spacecatninja\imagebosstransformer;
 
+use craft\base\Model;
 use craft\base\Plugin;
 
 use spacecatninja\imagebosstransformer\models\Settings;
@@ -21,15 +22,12 @@ class ImageBossTransformer extends Plugin
     // Static Properties
     // =========================================================================
 
-    /**
-     * @var ImageBossTransformer
-     */
-    public static $plugin;
+    public static ImageBossTransformer $plugin;
 
     // Public Methods
     // =========================================================================
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -47,7 +45,7 @@ class ImageBossTransformer extends Plugin
     /**
      * @inheritdoc
      */
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?Model
     {
         return new Settings();
     }

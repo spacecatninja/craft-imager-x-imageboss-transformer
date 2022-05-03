@@ -24,7 +24,7 @@ class ImageBossHelpers
     {
         $settings = ImageBossTransformer::$plugin->getSettings();
         
-        if (isset($settings->profiles[$name])) {
+        if ($settings && isset($settings->profiles[$name])) {
             return new ImageBossProfile($settings->profiles[$name]);
         }
         
@@ -121,7 +121,7 @@ class ImageBossHelpers
         
         if (isset($effects['blur'])) {
             $val = $effects['blur'];
-            if (is_bool($val) && $val === true) {
+            if ($val === true) {
                 $r[] = 'blur:2';
             } else {
                 $r[] = "blur:$val";
@@ -130,7 +130,7 @@ class ImageBossHelpers
         
         if (isset($effects['sharpen'])) {
             $val = $effects['sharpen'];
-            if (is_bool($val) && $val === true) {
+            if ($val === true) {
                 $r[] = 'sharpen:2';
             } else {
                 $r[] = "sharpen:$val";
