@@ -23,7 +23,7 @@ use spacecatninja\imagerx\exceptions\ImagerException;
 
 class ImageBoss extends Component implements TransformerInterface
 {
-    
+
     /**
      * @param Asset $image
      * @param array $transforms
@@ -97,7 +97,7 @@ class ImageBoss extends Component implements TransformerInterface
                     if ($coverMode) {
                         $urlSegments[] = 'cover:'.$coverMode;
                         $urlSegments[] = $sizeSegment;
-                        
+
                         if ($coverMode === 'face' && isset($transform['cropZoom'])) {
                             $opts[] = 'fp-z:'.$transform['cropZoom'];
                         }
@@ -115,54 +115,58 @@ class ImageBoss extends Component implements TransformerInterface
             $urlSegments[] = 'height';
             $urlSegments[] = $transform['height'];
         }
-        
+
         // Set quality
         $opts[] = 'quality:'.ImageBossHelpers::getQualityFromExtension($image->getExtension(), $transform);
-        
+
         // Set default opts
         if ($settings->enableCompression === false) {
-             $opts[] = 'compression:false';
+            $opts[] = 'compression:false';
         }
-        
+
         if ($settings->enableProgressive === false) {
-             $opts[] = 'progressive:false';
+            $opts[] = 'progressive:false';
         }
-        
+
         if ($settings->enableAutoRotate === false) {
-             $opts[] = 'autorotate:false';
+            $opts[] = 'autorotate:false';
         }
-        
+
         if (isset($transform['format'])) {
             $opts[] = 'format:'.$transform['format'];
         }
-        
+
         // parse effects
         $opts = array_merge($opts, ImageBossHelpers::getEffects($transform));
-        
+
         // add custom opts
         if (isset($transformerParams['options'])) {
             $opts[] = $transformerParams['options'];
         }
-        
+
         // Add options
         $urlSegments[] = implode(',', $opts);
-        
+        $volume = $image->getVolume();
+        $fs = $volume->getFs();
+
         // Add cloud source path if applicable
         if ($profile->useCloudSourcePath) {
             try {
-                $fs = $image->getVolume()->getFs();
-                
                 if (property_exists($fs, 'subfolder') && $fs->subfolder !== '' && $fs::class !== Local::class) {
-                    $urlSegments[] = App::parseEnv($fs->subfolder);
+                    $urlSegments[] = trim(App::parseEnv($fs->subfolder), '/');
                 }
             } catch (\Throwable) {
-                
+
             }
         }
-        
+
+        if ($volume->getSubpath() !== '') {
+            $urlSegments[] = trim(App::parseEnv($volume->getSubpath()), '/');
+        }
+
         // Add file path
         $urlSegments[] = $image->path;
-        
+
         // Merge to url
         $url = implode('/', $urlSegments);
 
@@ -171,8 +175,8 @@ class ImageBoss extends Component implements TransformerInterface
             $bossToken = hash_hmac('sha256', parse_url($url, PHP_URL_PATH), $profile->signToken);
             $url .= "?bossToken=$bossToken";
         }
-        
+
         return new ImageBossTransformedImageModel($url, $image, $transform);
     }
-    
+
 }
