@@ -54,7 +54,7 @@ class ImageBossTransformedImageModel extends BaseTransformedImageModel implement
         } else if (isset($transform['width']) || isset($transform['height'])) {
             if ($source !== null && $transform !== null) {
                 [$sourceWidth, $sourceHeight] = $this->getSourceImageDimensions($source);
-                [$w, $h] = $this->calculateTargetSize($transform, $sourceWidth, $sourceHeight);
+                [$w, $h] = $this->calculateTargetSize($transform, $sourceWidth ?? 1, $sourceHeight ?? 1);
 
                 $this->width = $w;
                 $this->height = $h;
@@ -93,10 +93,10 @@ class ImageBossTransformedImageModel extends BaseTransformedImageModel implement
         $h = $transform['height'] ?? null;
 
         if ($w) {
-            return [$w, round($w / $ratio)];
+            return [$w, (int)round($w / $ratio)];
         }
         if ($h) {
-            return [round($h * $ratio), $h];
+            return [(int)round($h * $ratio), $h];
         }
 
         return [0, 0];
