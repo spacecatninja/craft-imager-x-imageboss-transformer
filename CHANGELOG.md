@@ -1,5 +1,11 @@
 # ImageBoss transformer for Imager X Changelog
 
+
+## 3.0.1 - 2024-06-16
+
+### Fixed
+- Fixed an issue that would throw an error if width or height for source image was `null` (fixes #1)
+
 ## 3.0.0 - 2024-02-10
 
 ### Added

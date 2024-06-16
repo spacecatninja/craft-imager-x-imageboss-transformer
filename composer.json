@@ -2,7 +2,7 @@
     "name": "spacecatninja/imager-x-imageboss-transformer",
     "description": "ImageBoss transformer for Imager X",
     "type": "craft-plugin",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "license": "MIT",
     "keywords": [
         "craft",
