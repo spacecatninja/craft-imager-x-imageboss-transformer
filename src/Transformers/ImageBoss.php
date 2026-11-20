@@ -6,17 +6,17 @@
  * @copyright Copyright (c) 2021 André Elvan
  */
 
-namespace spacecatninja\imagebosstransformer\transformers;
+namespace SpaceCatNinja\ImageBossTransformer\Transformers;
 
 use craft\base\Component;
 use craft\elements\Asset;
 
 use craft\fs\Local;
 use craft\helpers\App;
-use spacecatninja\imagebosstransformer\ImageBossTransformer;
-use spacecatninja\imagebosstransformer\helpers\ImageBossHelpers;
-use spacecatninja\imagebosstransformer\models\ImageBossTransformedImageModel;
-use spacecatninja\imagebosstransformer\models\Settings;
+use SpaceCatNinja\ImageBossTransformer\ImageBossTransformer;
+use SpaceCatNinja\ImageBossTransformer\Support\ImageBossHelpers;
+use SpaceCatNinja\ImageBossTransformer\Data\ImageBossTransformedImageModel;
+use SpaceCatNinja\ImageBossTransformer\Settings;
 use spacecatninja\imagerx\services\ImagerService;
 use spacecatninja\imagerx\transformers\TransformerInterface;
 use spacecatninja\imagerx\exceptions\ImagerException;

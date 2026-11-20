@@ -6,13 +6,13 @@
  * @copyright Copyright (c) 2021 André Elvan
  */
 
-namespace spacecatninja\imagebosstransformer;
+namespace SpaceCatNinja\ImageBossTransformer;
 
 use craft\base\Model;
 use craft\base\Plugin;
 
-use spacecatninja\imagebosstransformer\models\Settings;
-use spacecatninja\imagebosstransformer\transformers\ImageBoss;
+use SpaceCatNinja\ImageBossTransformer\Settings;
+use SpaceCatNinja\ImageBossTransformer\Transformers\ImageBoss;
 
 use yii\base\Event;
 

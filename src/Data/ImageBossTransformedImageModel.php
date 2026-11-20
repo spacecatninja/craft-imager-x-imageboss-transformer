@@ -6,7 +6,7 @@
  * @copyright Copyright (c) 2021 André Elvan
  */
 
-namespace spacecatninja\imagebosstransformer\models;
+namespace SpaceCatNinja\ImageBossTransformer\Data;
 
 use craft\elements\Asset;
 use spacecatninja\imagerx\models\BaseTransformedImageModel;

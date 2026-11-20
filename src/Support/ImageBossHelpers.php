@@ -6,10 +6,10 @@
  * @copyright Copyright (c) 2021 André Elvan
  */
 
-namespace spacecatninja\imagebosstransformer\helpers;
+namespace SpaceCatNinja\ImageBossTransformer\Support;
 
-use spacecatninja\imagebosstransformer\ImageBossTransformer;
-use spacecatninja\imagebosstransformer\models\ImageBossProfile;
+use SpaceCatNinja\ImageBossTransformer\ImageBossTransformer;
+use SpaceCatNinja\ImageBossTransformer\Data\ImageBossProfile;
 use spacecatninja\imagerx\models\ConfigModel;
 use spacecatninja\imagerx\services\ImagerService;
 
