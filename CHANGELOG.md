@@ -5,6 +5,9 @@
 > [!IMPORTANT]
 > Version 4 requires Craft CMS 6, Imager X 7 and PHP 8.5, the config file moves to `config/craft/`, and there are breaking changes for code that uses the plugin's classes. See [UPGRADE.md](UPGRADE.md).
 
+### Added
+- Added the `addPath` profile setting, which prepends a path to the asset's path, or a path per volume handle.
+
 ### Changed
 - The plugin now requires Craft CMS 6, Imager X 7.0.0-beta.2 or later, and PHP 8.5, and uses Craft 6's native plugin APIs. It doesn't need the Yii 2 adapter.
 - The config file is now `config/craft/imager-x-imageboss-transformer.php`, and is a plain Laravel config file.

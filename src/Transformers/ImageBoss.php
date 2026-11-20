@@ -166,6 +166,14 @@ class ImageBoss implements TransformerInterface
         $disk = $volume->sourceDisk();
         $subpath = trim($volume->getSubpath(), '/');
 
+        // Add the profile's addPath, or the one for the image's volume
+        $addPath = \is_array($profile->addPath) ? ($profile->addPath[$volume->handle] ?? '') : $profile->addPath;
+        $addPath = trim((string)$addPath, '/');
+
+        if ($addPath !== '') {
+            $urlSegments[] = $addPath;
+        }
+
         if ($profile->useCloudSourcePath && !$disk instanceof LocalFilesystemAdapter) {
             // Add the cloud source path: the disk's root, and the volume's subpath
             $cloudSourcePath = trim($disk->path(''), '/');

@@ -92,11 +92,15 @@ Example profile:
         'sourceName' => 'imagerx-web',
         'signToken' => env('IMAGEBOSS_WEB_SIGN_TOKEN', ''),
         'useCloudSourcePath' => false,
+        'addPath' => [
+            'images' => 'uploads/images',
+            'otherimages' => 'uploads/other',
+        ],
     ]
 ],
 ```
 
-Each profile takes three settings:
+Each profile takes four settings:
 
 *sourceName*: This is the "Source Name" you selected in ImageBoss.
 
@@ -106,6 +110,11 @@ Each profile takes three settings:
 adding it to the ImageBoss URL. This makes it possible to have one ImageBoss source pulling images from many Craft volumes when 
 they are for instance on the same S3 bucket, but in different folders. This only applies to cloud disks (for instance S3 and 
 GCS), not local disks. The volume's subpath is always added.
+
+*addPath*: Prepends a path to the asset's path, before the cloud source path or the volume's subpath. Can be useful if you
+have several volumes that you want to serve with one ImageBoss source, for instance a web proxy source pointing to your
+site's root. If this setting is an array, the key should be the volume handle, and the value the path to add. Volumes
+that aren't in the array get no path added. See example above.
 
 ### defaultProfile [string]
 Default: `''`  
