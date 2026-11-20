@@ -3,51 +3,39 @@
  * ImageBoss transformer for Imager X
  *
  * @link      https://www.spacecat.ninja
- * @copyright Copyright (c) 2021 André Elvan
+ * @copyright Copyright (c) 2026 André Elvan
  */
 
 namespace SpaceCatNinja\ImageBossTransformer;
 
-use craft\base\Model;
-use craft\base\Plugin;
-
-use SpaceCatNinja\ImageBossTransformer\Settings;
+use CraftCms\Cms\Plugin\Plugin;
+use CraftCms\Cms\Plugin\PluginSettings;
 use SpaceCatNinja\ImageBossTransformer\Transformers\ImageBoss;
-
-use yii\base\Event;
-
+use SpaceCatNinja\ImagerX\Transformers\Transformers;
 
 class ImageBossTransformer extends Plugin
 {
-    // Static Properties
-    // =========================================================================
-
-    public static ImageBossTransformer $plugin;
-
     // Public Methods
     // =========================================================================
 
-    public function init(): void
+    public function register(): void
     {
-        parent::init();
+        parent::register();
 
-        self::$plugin = $this;
-        
-        // Register transformer with Imager
-        Event::on(\spacecatninja\imagerx\ImagerX::class,
-            \spacecatninja\imagerx\ImagerX::EVENT_REGISTER_TRANSFORMERS,
-            static function (\spacecatninja\imagerx\events\RegisterTransformersEvent $event) {
-                $event->transformers['imageboss'] = ImageBoss::class;
-            }
-        );
+        $this->app->singleton(Settings::class, fn() => $this->getSettings());
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function createSettingsModel(): ?Model
+    public function boot(Transformers $transformers): void
+    {
+        // Register transformer with Imager X
+        $transformers->register('imageboss', ImageBoss::class);
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    protected static function createSettings(): ?PluginSettings
     {
         return new Settings();
     }
-
 }

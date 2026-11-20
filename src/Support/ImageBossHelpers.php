@@ -8,10 +8,9 @@
 
 namespace SpaceCatNinja\ImageBossTransformer\Support;
 
-use SpaceCatNinja\ImageBossTransformer\ImageBossTransformer;
 use SpaceCatNinja\ImageBossTransformer\Data\ImageBossProfile;
-use spacecatninja\imagerx\models\ConfigModel;
-use spacecatninja\imagerx\services\ImagerService;
+use SpaceCatNinja\ImageBossTransformer\Settings;
+use SpaceCatNinja\ImagerX\Services\ImagerService;
 
 class ImageBossHelpers
 {
@@ -22,9 +21,9 @@ class ImageBossHelpers
      */
     public static function getProfile(string $name): ?ImageBossProfile
     {
-        $settings = ImageBossTransformer::$plugin->getSettings();
-        
-        if ($settings && isset($settings->profiles[$name])) {
+        $settings = app(Settings::class);
+
+        if (isset($settings->profiles[$name])) {
             return new ImageBossProfile($settings->profiles[$name]);
         }
         
@@ -38,7 +37,6 @@ class ImageBossHelpers
      */
     public static function getFocalPointString(array $transform): string
     {
-        /** @var ConfigModel $settings */
         $config = ImagerService::getConfig();
         [$x, $y] = explode(' ', $config->getSetting('position', $transform));
         
@@ -83,9 +81,8 @@ class ImageBossHelpers
      *
      * @return string
      */
-    public static function getQualityFromExtension(string $ext, array $transform = null): string
+    public static function getQualityFromExtension(string $ext, ?array $transform = null): string
     {
-        /** @var ConfigModel $settings */
         $config = ImagerService::getConfig();
 
         switch ($ext) {

@@ -3,14 +3,14 @@
  * ImageBoss transformer for Imager X
  *
  * @link      https://www.spacecat.ninja
- * @copyright Copyright (c) 2021 André Elvan
+ * @copyright Copyright (c) 2026 André Elvan
  */
 
 namespace SpaceCatNinja\ImageBossTransformer;
 
-use craft\base\Model;
+use CraftCms\Cms\Plugin\PluginSettings;
 
-class Settings extends Model
+class Settings extends PluginSettings
 {
     public string $baseUrl = 'https://img.imageboss.me';
     public string $apiKey = '';

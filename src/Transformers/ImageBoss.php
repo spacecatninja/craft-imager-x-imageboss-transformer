@@ -8,31 +8,27 @@
 
 namespace SpaceCatNinja\ImageBossTransformer\Transformers;
 
-use craft\base\Component;
-use craft\elements\Asset;
-
-use craft\fs\Local;
-use craft\helpers\App;
-use SpaceCatNinja\ImageBossTransformer\ImageBossTransformer;
-use SpaceCatNinja\ImageBossTransformer\Support\ImageBossHelpers;
+use CraftCms\Cms\Asset\Elements\Asset;
+use Illuminate\Filesystem\LocalFilesystemAdapter;
 use SpaceCatNinja\ImageBossTransformer\Data\ImageBossTransformedImageModel;
 use SpaceCatNinja\ImageBossTransformer\Settings;
-use spacecatninja\imagerx\services\ImagerService;
-use spacecatninja\imagerx\transformers\TransformerInterface;
-use spacecatninja\imagerx\exceptions\ImagerException;
+use SpaceCatNinja\ImageBossTransformer\Support\ImageBossHelpers;
+use SpaceCatNinja\ImagerX\Exceptions\ImagerException;
+use SpaceCatNinja\ImagerX\Services\ImagerService;
+use SpaceCatNinja\ImagerX\Transformers\TransformerInterface;
 
-class ImageBoss extends Component implements TransformerInterface
+class ImageBoss implements TransformerInterface
 {
 
     /**
-     * @param Asset $image
+     * @param Asset|string $image
      * @param array $transforms
      *
      * @return array|null
      *
      * @throws ImagerException
      */
-    public function transform($image, array $transforms): ?array
+    public function transform(Asset|string $image, array $transforms): ?array
     {
         $transformedImages = [];
 
@@ -52,8 +48,7 @@ class ImageBoss extends Component implements TransformerInterface
      */
     private function getTransformedImage(Asset $image, array $transform): ImageBossTransformedImageModel
     {
-        /** @var Settings $settings */
-        $settings = ImageBossTransformer::$plugin->getSettings();
+        $settings = app(Settings::class);
         $config = ImagerService::getConfig();
         $transformerParams = $transform['transformerParams'] ?? [];
 
@@ -147,25 +142,22 @@ class ImageBoss extends Component implements TransformerInterface
         // Add options
         $urlSegments[] = implode(',', $opts);
         $volume = $image->getVolume();
-        $fs = $volume->getFs();
+        $disk = $volume->sourceDisk();
+        $subpath = trim($volume->getSubpath(), '/');
 
-        // Add cloud source path if applicable
-        if ($profile->useCloudSourcePath) {
-            try {
-                if (property_exists($fs, 'subfolder') && $fs->subfolder !== '' && $fs::class !== Local::class) {
-                    $urlSegments[] = trim(App::parseEnv($fs->subfolder), '/');
-                }
-            } catch (\Throwable) {
+        if ($profile->useCloudSourcePath && !$disk instanceof LocalFilesystemAdapter) {
+            // Add the cloud source path: the disk's root, and the volume's subpath
+            $cloudSourcePath = trim($disk->path(''), '/');
 
+            if ($cloudSourcePath !== '') {
+                $urlSegments[] = $cloudSourcePath;
             }
-        }
-
-        if ($volume->getSubpath() !== '') {
-            $urlSegments[] = trim(App::parseEnv($volume->getSubpath()), '/');
+        } elseif ($subpath !== '') {
+            $urlSegments[] = $subpath;
         }
 
         // Add file path
-        $urlSegments[] = $image->path;
+        $urlSegments[] = $image->getPath();
 
         // Merge to url
         $url = implode('/', $urlSegments);

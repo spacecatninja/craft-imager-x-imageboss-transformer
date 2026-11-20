@@ -8,21 +8,23 @@
 
 namespace SpaceCatNinja\ImageBossTransformer\Data;
 
-use craft\elements\Asset;
-use spacecatninja\imagerx\models\BaseTransformedImageModel;
-use spacecatninja\imagerx\models\TransformedImageInterface;
+use CraftCms\Cms\Asset\Elements\Asset;
+use SpaceCatNinja\ImagerX\Data\BaseTransformedImageModel;
+use SpaceCatNinja\ImagerX\Data\TransformedImageInterface;
 
 class ImageBossTransformedImageModel extends BaseTransformedImageModel implements TransformedImageInterface
 {
     /**
-     * ImgixTransformedImageModel constructor.
+     * ImageBossTransformedImageModel constructor.
      *
      * @param string|null $imageUrl
      * @param Asset|null  $source
      * @param array       $transform
      */
-    public function __construct(string $imageUrl = null, Asset $source = null, array $transform = [])
+    public function __construct(?string $imageUrl = null, ?Asset $source = null, array $transform = [])
     {
+        $this->source = $source;
+
         if ($imageUrl !== null) {
             $this->url = $imageUrl;
         }
