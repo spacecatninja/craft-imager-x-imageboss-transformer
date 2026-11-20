@@ -85,7 +85,7 @@ class ImageBossHelpers
     {
         $config = ImagerService::getConfig();
 
-        switch ($ext) {
+        switch (strtolower($ext)) {
             case 'png':
                 $pngCompression = $config->getSetting('pngCompressionLevel', $transform);
                 return max(100 - ($pngCompression * 10), 1);

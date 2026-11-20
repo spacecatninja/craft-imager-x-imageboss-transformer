@@ -17,6 +17,8 @@ use SpaceCatNinja\ImagerX\Exceptions\ImagerException;
 use SpaceCatNinja\ImagerX\Services\ImagerService;
 use SpaceCatNinja\ImagerX\Transformers\TransformerInterface;
 
+use function CraftCms\Cms\t;
+
 class ImageBoss implements TransformerInterface
 {
 
@@ -30,6 +32,10 @@ class ImageBoss implements TransformerInterface
      */
     public function transform(Asset|string $image, array $transforms): ?array
     {
+        if (\is_string($image)) {
+            throw new ImagerException(t('The ImageBoss transformer can only transform assets, not paths or URLs.', category: 'imager-x-imageboss-transformer'));
+        }
+
         $transformedImages = [];
 
         foreach ($transforms as $transform) {
@@ -51,6 +57,7 @@ class ImageBoss implements TransformerInterface
         $settings = app(Settings::class);
         $config = ImagerService::getConfig();
         $transformerParams = $transform['transformerParams'] ?? [];
+        $allowUpscale = (bool)$config->getSetting('allowUpscale', $transform);
 
         $profileName = $transformerParams['profile'] ?? $settings->defaultProfile;
         $profile = ImageBossHelpers::getProfile($profileName);
@@ -77,10 +84,6 @@ class ImageBoss implements TransformerInterface
                     $urlSegments[] = 'cover:inside';
                     $urlSegments[] = $sizeSegment;
                     break;
-                case 'stretch':
-                case 'croponly':
-                    // not supported
-                    break;
                 case 'letterbox':
                     $urlSegments[] = 'cover:contain';
                     $urlSegments[] = $sizeSegment;
@@ -89,6 +92,7 @@ class ImageBoss implements TransformerInterface
                     $opts[] = 'fill-color:'.ImageBossHelpers::getLetterboxColor($letterboxDef);
                     break;
                 default:
+                    // ImageBoss can't stretch or crop without resizing, so `stretch` and `croponly` crop like `crop`
                     if ($coverMode) {
                         $urlSegments[] = 'cover:'.$coverMode;
                         $urlSegments[] = $sizeSegment;
@@ -103,16 +107,24 @@ class ImageBoss implements TransformerInterface
                     }
                     break;
             }
-        } elseif (isset($transform['width'])) {
+        } elseif (isset($transform['width']) || isset($transform['height'])) {
+            $urlSegments[] = isset($transform['width']) ? 'width' : 'height';
+            $urlSegments[] = $transform['width'] ?? $transform['height'];
+
+            // The width and height operations enlarge images unless they're told not to
+            if (!$allowUpscale) {
+                $opts[] = 'withoutEnlargement:true';
+            }
+        } elseif ($image->getWidth()) {
+            // Every URL needs an operation, so an image that isn't resized gets its own width
             $urlSegments[] = 'width';
-            $urlSegments[] = $transform['width'];
-        } elseif (isset($transform['height'])) {
-            $urlSegments[] = 'height';
-            $urlSegments[] = $transform['height'];
+            $urlSegments[] = (int)$image->getWidth();
+        } else {
+            $urlSegments[] = 'cdn';
         }
 
-        // Set quality
-        $opts[] = 'quality:'.ImageBossHelpers::getQualityFromExtension($image->getExtension(), $transform);
+        // Set quality, from the format the image is transformed to, or the image's own
+        $opts[] = 'quality:'.ImageBossHelpers::getQualityFromExtension($transform['format'] ?? $image->getExtension(), $transform);
 
         // Set default opts
         if ($settings->enableCompression === false) {
@@ -168,7 +180,7 @@ class ImageBoss implements TransformerInterface
             $url .= "?bossToken=$bossToken";
         }
 
-        return new ImageBossTransformedImageModel($url, $image, $transform);
+        return new ImageBossTransformedImageModel($url, $image, $transform, $allowUpscale);
     }
 
 }

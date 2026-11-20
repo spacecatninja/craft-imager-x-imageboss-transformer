@@ -20,8 +20,9 @@ class ImageBossTransformedImageModel extends BaseTransformedImageModel implement
      * @param string|null $imageUrl
      * @param Asset|null  $source
      * @param array       $transform
+     * @param bool        $upscale   Whether an image transformed with only a width or height may be enlarged.
      */
-    public function __construct(?string $imageUrl = null, ?Asset $source = null, array $transform = [])
+    public function __construct(?string $imageUrl = null, ?Asset $source = null, array $transform = [], bool $upscale = true)
     {
         $this->source = $source;
 
@@ -57,6 +58,11 @@ class ImageBossTransformedImageModel extends BaseTransformedImageModel implement
             if ($source !== null && $transform !== null) {
                 [$sourceWidth, $sourceHeight] = $this->getSourceImageDimensions($source);
                 [$w, $h] = $this->calculateTargetSize($transform, $sourceWidth ?? 1, $sourceHeight ?? 1);
+
+                // The width and height operations don't enlarge the image with withoutEnlargement
+                if (!$upscale && $sourceWidth && $sourceHeight && ($w > $sourceWidth || $h > $sourceHeight)) {
+                    [$w, $h] = [(int)$sourceWidth, (int)$sourceHeight];
+                }
 
                 $this->width = $w;
                 $this->height = $h;
