@@ -1,5 +1,27 @@
 # ImageBoss transformer for Imager X Changelog
 
+## 4.0.0 - Unreleased
+
+> [!IMPORTANT]
+> Version 4 requires Craft CMS 6, Imager X 7 and PHP 8.5, the config file moves to `config/craft/`, and there are breaking changes for code that uses the plugin's classes. See [UPGRADE.md](UPGRADE.md).
+
+### Changed
+- The plugin now requires Craft CMS 6, Imager X 7.0.0-beta.2 or later, and PHP 8.5, and uses Craft 6's native plugin APIs. It doesn't need the Yii 2 adapter.
+- The config file is now `config/craft/imager-x-imageboss-transformer.php`, and is a plain Laravel config file.
+- Classes moved to the `SpaceCatNinja\ImageBossTransformer` namespace, and to Laravel-style folders.
+- The transformer is now registered with Imager X's `Transformers` registry.
+- With `useCloudSourcePath`, the cloud source path is now the `root` of the volume's filesystem disk. Version 3 used the filesystem's subfolder. The volume's subpath is still always added.
+- `ImageBossTransformedImageModel`'s constructor takes an optional `$upscale` argument.
+
+### Removed
+- Removed the `ImageBossTransformer::$plugin` property.
+
+### Fixed
+- Fixed modes `stretch` and `croponly`, and transforms without a `width` or `height`, giving URLs without an operation, which ImageBoss requires. `stretch` and `croponly` now crop like `crop`, and a transform without a size uses the `width` operation with the source's width.
+- Fixed `webpQuality`, `avifQuality` and `pngCompressionLevel` being ignored when a transform set `format`. The quality came from the source image's extension.
+- Fixed `allowUpscale` being ignored. Transforms with only a `width` or `height` now get ImageBoss' `withoutEnlargement` option when it's off, and their size is no larger than the source.
+- Fixed transforming a path or URL throwing a `TypeError`. It now throws an `ImagerException`, since only assets can be transformed.
+
 
 ## 3.0.1 - 2024-06-16
 

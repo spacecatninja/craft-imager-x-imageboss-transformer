@@ -5,13 +5,15 @@ Also, an example of [how to make a custom transformer for Imager X](https://imag
 
 ## Requirements
 
-This plugin requires Craft CMS 5.0.0-beta.1 or later, [Imager X 5.0.0-beta.1](https://github.com/spacecatninja/craft-imager-x/) or later,
-and an account at [ImageBoss](https://imageboss.me/).
+This plugin requires Craft CMS 6.0.0 or later, [Imager X 7.0.0](https://github.com/spacecatninja/craft-imager-x/) or later
+(the Pro edition, like all custom transformers), PHP 8.5 or later, and an account at [ImageBoss](https://imageboss.me/).
+
+Version 3.x of this plugin supports Craft CMS 5 and Imager X 5 and 6. See [UPGRADE.md](UPGRADE.md) when moving to Craft 6.
  
 ## Usage
 
 Install and configure this transformer as described below. Then, in your [Imager X config](https://imager-x.spacecat.ninja/configuration.html), 
-set the transformer to `imageboss`, ie:
+`config/craft/imager-x.php`, set the transformer to `imageboss`, ie:
 
 ```
 'transformer' => 'imageboss',
@@ -35,7 +37,9 @@ This transformer only supports a subset of what Imager X can do when using the d
 All the basic transform parameters are supported, with the following exceptions:
 
 - Only assets can be transformed. If you need to transform external images, you need to switch to the `craft` transformer for those transforms.
-- The `cropOnly` and `stretch` resize modes are not supported.
+- The `croponly` and `stretch` resize modes are not supported, and crop the image like `crop`.
+- `allowUpscale` only applies to transforms with only a `width` or `height`, which get ImageBoss' `withoutEnlargement`
+  option when it's off.
 - Opacity for colors on `letterbox` resize mode is not supported.
 - Only the following `effects` are converted and supported: `grayscale`, `sharpen`, `blur` and `gamma`.
 – Watermarks are not translated automatically from Imager syntax to ImageBoss', but you can still add watermarks by manually passing them through the `options` object (see below).
@@ -57,13 +61,14 @@ For more information, check out the [ImageBoss documentation](https://imageboss.
 To install the plugin, follow these instructions:
 
 1. Install with composer via `composer require spacecatninja/imager-x-imageboss-transformer` from your project directory.
-2. Install the plugin in the Craft Control Panel under Settings > Plugins, or from the command line via `./craft plugin/install imager-x-imageboss-transformer`.
+2. Install the plugin in the Craft Control Panel under Settings > Plugins, or from the command line via `php artisan craft:plugin:install imager-x-imageboss-transformer`.
 
 
 ## Configuration
 
-You can configure the transformer by creating a file in your config folder called
-`imager-x-imageboss-transformer.php`, and override settings as needed.
+You can configure the transformer by creating a file called `imager-x-imageboss-transformer.php` in your 
+`config/craft/` folder, and override settings as needed. It's a plain Laravel config file, so use `env()` for 
+sign tokens and other environment-specific values.
 
 ### profiles [array]
 Default: `[]`  
@@ -77,12 +82,12 @@ Example profile:
 'profiles' => [
     'default' => [
         'sourceName' => 'imagerx-s3',
-        'signToken' => '7a7cc5142212378b435edb18b273bec8799e1270272cc49f34836651cd023a28',
+        'signToken' => env('IMAGEBOSS_SIGN_TOKEN', ''),
         'useCloudSourcePath' => true,
     ],
     'web' => [
         'sourceName' => 'imagerx-web',
-        'signToken' => '1b7ca41421125791a31edb18a273bec8792e1970272ad49f34836631cd023a28',
+        'signToken' => env('IMAGEBOSS_WEB_SIGN_TOKEN', ''),
         'useCloudSourcePath' => false,
     ]
 ],
@@ -94,14 +99,14 @@ Each profile takes three settings:
 
 *signToken*: If you've enabled signed URL's for security, add your sign token here. 
 
-*useCloudSourcePath*: If enabled, Imager will prepend the Craft source path to the asset path, before adding it to the 
-ImageBoss URL. This makes it possible to have one ImageBoss source pulling images from many Craft volumes when they are for instance 
-on the same S3 bucket, but in different subfolder. This only works on volumes that implements a path 
-setting (AWS S3 and GCS does, local volumes does not).
+*useCloudSourcePath*: If enabled, Imager will prepend the `root` of the volume's filesystem disk to the asset path, before 
+adding it to the ImageBoss URL. This makes it possible to have one ImageBoss source pulling images from many Craft volumes when 
+they are for instance on the same S3 bucket, but in different folders. This only applies to cloud disks (for instance S3 and 
+GCS), not local disks. The volume's subpath is always added.
 
 ### defaultProfile [string]
 Default: `''`  
-Sets the default profile to use (see `profiles`). You can override profile at the transform level by setting it through the `transformParams` transform parameter. Example:
+Sets the default profile to use (see `profiles`). You can override profile at the transform level by setting it through the `transformerParams` transform parameter. Example:
 
 ```
 {% set transforms = craft.imagerx.transformImage(asset, 
