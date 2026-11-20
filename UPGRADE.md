@@ -69,9 +69,13 @@ With a profile's `useCloudSourcePath` setting on, the path of an asset in the Im
 Some transform URLs change:
 
 - Modes `stretch` and `croponly` now crop like `crop`. Version 3 left out the operation, which ImageBoss requires.
-- A transform without a `width` or `height`, for instance one that only sets `format`, now uses the `width` operation with the source's width, for the same reason.
+- A transform without a `width` or `height`, for instance one that only sets `format`, now uses the `cdn` operation, for the same reason.
 - A transform with `format` set to `webp`, `avif` or `png` now gets its quality from `webpQuality`, `avifQuality` or `pngCompressionLevel`.
-- A transform with only a `width` or `height` now gets ImageBoss' `withoutEnlargement:true` option when `allowUpscale` is off.
+- When `allowUpscale` is off:
+  - Mode `fit` and transforms with only a `width` or `height` now get ImageBoss' `withoutEnlargement:true` option.
+  - A crop larger than the source image is now made smaller, with the same ratio, like Imager X's `craft` transformer does. For example, `width: 3000, height: 1000` of a 2400x1600 image gives a 2400x800 image instead of an enlarged 3000x1000 one.
+
+The size the transformer reports for mode `fit` with `allowUpscale` on is now the enlarged size ImageBoss gives, not the source image's size.
 
 ### Namespace and classes
 

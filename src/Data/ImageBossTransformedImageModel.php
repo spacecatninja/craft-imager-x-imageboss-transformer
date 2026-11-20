@@ -20,7 +20,7 @@ class ImageBossTransformedImageModel extends BaseTransformedImageModel implement
      * @param string|null $imageUrl
      * @param Asset|null  $source
      * @param array       $transform
-     * @param bool        $upscale   Whether an image transformed with only a width or height may be enlarged.
+     * @param bool        $upscale   Whether an image transformed with mode `fit`, or only a width or height, may be enlarged.
      */
     public function __construct(?string $imageUrl = null, ?Asset $source = null, array $transform = [], bool $upscale = true)
     {
@@ -42,13 +42,14 @@ class ImageBossTransformedImageModel extends BaseTransformedImageModel implement
                 $transformW = (int)$transform['width'];
                 $transformH = (int)$transform['height'];
 
-                if ($sourceWidth !== 0 && $sourceHeight !== 0) {
+                // ImageBoss' cover:inside enlarges the image to fit, unless it's told not to
+                if ($sourceWidth && $sourceHeight) {
                     if ($sourceWidth / $sourceHeight > $transformW / $transformH) {
-                        $useW = min($transformW, $sourceWidth);
+                        $useW = $upscale ? $transformW : min($transformW, $sourceWidth);
                         $this->width = $useW;
                         $this->height = round($useW * ($sourceHeight / $sourceWidth));
                     } else {
-                        $useH = min($transformH, $sourceHeight);
+                        $useH = $upscale ? $transformH : min($transformH, $sourceHeight);
                         $this->width = round($useH * ($sourceWidth / $sourceHeight));
                         $this->height = $useH;
                     }

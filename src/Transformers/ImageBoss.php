@@ -10,11 +10,13 @@ namespace SpaceCatNinja\ImageBossTransformer\Transformers;
 
 use CraftCms\Cms\Asset\Elements\Asset;
 use Illuminate\Filesystem\LocalFilesystemAdapter;
+use Imagine\Image\Box;
 use SpaceCatNinja\ImageBossTransformer\Data\ImageBossTransformedImageModel;
 use SpaceCatNinja\ImageBossTransformer\Settings;
 use SpaceCatNinja\ImageBossTransformer\Support\ImageBossHelpers;
 use SpaceCatNinja\ImagerX\Exceptions\ImagerException;
 use SpaceCatNinja\ImagerX\Services\ImagerService;
+use SpaceCatNinja\ImagerX\Support\ImagerHelpers;
 use SpaceCatNinja\ImagerX\Transformers\TransformerInterface;
 
 use function CraftCms\Cms\t;
@@ -68,21 +70,30 @@ class ImageBoss implements TransformerInterface
 
         $urlSegments = [$settings->baseUrl, $profile->sourceName];
         $opts = [];
-        $hasBothDimensions = isset($transform['width'], $transform['height']);
-        $sizeSegment = '';
 
-        if ($hasBothDimensions) {
-            $sizeSegment = $transform['width'].'x'.$transform['height'];
-        }
-
-        if ($hasBothDimensions) {
+        if (isset($transform['width'], $transform['height'])) {
             $mode = $transform['mode'] ?? 'crop';
             $coverMode = $transformerParams['coverMode'] ?? $transform['coverMode'] ?? null;
+
+            // ImageBoss' cover always gives the requested size, and its withoutEnlargement option changes the ratio,
+            // so a crop that would enlarge the image is made smaller, with the same ratio, like Imager X does.
+            if (!$allowUpscale && !\in_array($mode, ['fit', 'letterbox'], true) && $image->getWidth() && $image->getHeight()) {
+                [$width, $height] = ImagerHelpers::enforceMaxSize((int)$transform['width'], (int)$transform['height'], new Box((int)$image->getWidth(), (int)$image->getHeight()), true);
+                $transform['width'] = max(1, (int)$width);
+                $transform['height'] = max(1, (int)$height);
+            }
+
+            $sizeSegment = $transform['width'].'x'.$transform['height'];
 
             switch ($mode) {
                 case 'fit':
                     $urlSegments[] = 'cover:inside';
                     $urlSegments[] = $sizeSegment;
+
+                    // cover:inside enlarges images unless it's told not to
+                    if (!$allowUpscale) {
+                        $opts[] = 'withoutEnlargement:true';
+                    }
                     break;
                 case 'letterbox':
                     $urlSegments[] = 'cover:contain';
@@ -115,11 +126,9 @@ class ImageBoss implements TransformerInterface
             if (!$allowUpscale) {
                 $opts[] = 'withoutEnlargement:true';
             }
-        } elseif ($image->getWidth()) {
-            // Every URL needs an operation, so an image that isn't resized gets its own width
-            $urlSegments[] = 'width';
-            $urlSegments[] = (int)$image->getWidth();
         } else {
+            // Every URL needs an operation, and cdn serves the image at its own size. The width operation isn't used
+            // with the image's width, since ImageBoss refuses widths above about 5000 pixels.
             $urlSegments[] = 'cdn';
         }
 

@@ -38,8 +38,11 @@ All the basic transform parameters are supported, with the following exceptions:
 
 - Only assets can be transformed. If you need to transform external images, you need to switch to the `craft` transformer for those transforms.
 - The `croponly` and `stretch` resize modes are not supported, and crop the image like `crop`.
-- `allowUpscale` only applies to transforms with only a `width` or `height`, which get ImageBoss' `withoutEnlargement`
-  option when it's off.
+- With `allowUpscale` off, crops that would enlarge the image are made smaller, with the same ratio, and `fit` and
+  transforms with only a `width` or `height` get ImageBoss' `withoutEnlargement` option. The `letterbox` resize mode
+  always gives the requested size.
+- ImageBoss refuses transforms wider than about 5000 pixels or taller than 5000 pixels, also when `allowUpscale` is off
+  and the source image is larger.
 - Opacity for colors on `letterbox` resize mode is not supported.
 - Only the following `effects` are converted and supported: `grayscale`, `sharpen`, `blur` and `gamma`.
 – Watermarks are not translated automatically from Imager syntax to ImageBoss', but you can still add watermarks by manually passing them through the `options` object (see below).

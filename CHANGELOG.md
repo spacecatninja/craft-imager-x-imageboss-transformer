@@ -17,9 +17,10 @@
 - Removed the `ImageBossTransformer::$plugin` property.
 
 ### Fixed
-- Fixed modes `stretch` and `croponly`, and transforms without a `width` or `height`, giving URLs without an operation, which ImageBoss requires. `stretch` and `croponly` now crop like `crop`, and a transform without a size uses the `width` operation with the source's width.
+- Fixed modes `stretch` and `croponly`, and transforms without a `width` or `height`, giving URLs without an operation, which ImageBoss requires. `stretch` and `croponly` now crop like `crop`, and a transform without a size uses the `cdn` operation.
 - Fixed `webpQuality`, `avifQuality` and `pngCompressionLevel` being ignored when a transform set `format`. The quality came from the source image's extension.
-- Fixed `allowUpscale` being ignored. Transforms with only a `width` or `height` now get ImageBoss' `withoutEnlargement` option when it's off, and their size is no larger than the source.
+- Fixed `allowUpscale` being ignored. When it's off, mode `fit` and transforms with only a `width` or `height` get ImageBoss' `withoutEnlargement` option, and crops larger than the source image are made smaller, with the same ratio.
+- Fixed the reported size of `fit` transforms larger than the source image. ImageBoss enlarges them, but the transformer reported the source image's size.
 - Fixed transforming a path or URL throwing a `TypeError`. It now throws an `ImagerException`, since only assets can be transformed.
 
 
